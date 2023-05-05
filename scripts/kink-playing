@@ -1,0 +1,21 @@
+#!/bin/bash
+
+PYTHON=$(which python3)
+if [ -z "$PYTHON" ]; then
+  echo "Cannot find python3 executable - exiting"
+  exit 1
+fi
+
+mkdir -p "$HOME/.kink-playing"
+
+DEBUG=false; case "$@" in -d|--debug) DEBUG=true; esac
+
+# Use file as tty output
+# Launch with all passed arguments (future reserved)
+if $DEBUG; then
+    # Use importlib to import a module with a hyphen in its name
+    $PYTHON -Wd -c "import importlib; kp = importlib.import_module('kink-playing'); kp.main()"
+else
+    $PYTHON -OO -c "import importlib; kp = importlib.import_module('kink-playing'); kp.main()" &
+    echo "You can now close the terminal."
+fi

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=KINK Playing
+Comment=Notification for what is playing on KINK
+
+Type=Application
+Exec=kink-playing
+Terminal=false
+Icon=kink-playing
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-after=panel
+Categories=AudioVideo;Audio;

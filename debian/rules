@@ -1,0 +1,86 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Use bash and not the default sh
+SHELL := /bin/bash
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+# This has to be exported to make some magic below work.
+export DH_OPTIONS
+
+.PHONY: update
+
+source := $(shell dpkg-parsechangelog -S Source)
+pyfiles := $(shell find ./kink-playing -name '*.py' -print 2>/dev/null)
+desktopfls := $(shell find ./data -name '*.desktop' -print 2>/dev/null)
+
+# Create mo from the po files
+# https://www.gnu.org/software/make/manual/make.html#Pattern-Rules
+%.mo : %.po
+	mkdir -p ./po/mo/$(basename $(notdir $<))/LC_MESSAGES/
+	msgfmt $< -o ./po/mo/$(basename $(notdir $<))/LC_MESSAGES/$(source).mo
+
+%:
+	dh $@ --with=python3 --buildsystem=pybuild
+
+override_dh_auto_clean:
+	# Save new version in version.py
+	sed -i "s/^\(__version__\s*=\s*\).*\$$/\1'$(shell dpkg-parsechangelog -S Version)'/" version.py
+	# Cleanup first
+	rm -rf ./po/mo
+	mkdir ./po/mo
+
+override_dh_auto_install: update $(patsubst %.po,%.mo,$(wildcard ./po/*.po))
+	dh_auto_install
+
+override_dh_builddeb:
+	dh_builddeb
+	# Cleanup build directory when done
+	rm -rf ./debian/$(source)
+
+update:
+	# Get translations from Transifex
+	#tx pull -a
+
+	# Scan for .py files
+	@ xgettext \
+		--keyword=_ \
+		--language=Python \
+		--output=./po/$(source).pot \
+		--package-name=$(source) \
+		--package-version='' \
+		--from-code=UTF-8 \
+		$(pyfiles) && echo "Python files scanned for translations"
+
+	# Get strings from the desktop file
+	@ for LAUNCHER in $(desktopfls); do \
+		sed -r \
+			-e '/^(Comment|Keywords)\[/d' \
+			-e 's/^(Comment=|Keywords=)/_\1/' \
+			$$LAUNCHER > $$LAUNCHER.in ; \
+		intltool-extract --type=gettext/ini $$LAUNCHER.in ; \
+		xgettext \
+			--join-existing \
+			--keyword=N_:1 \
+			--output ./po/$(source).pot \
+			$$LAUNCHER.in.h ; \
+	done && echo "Desktop files scanned for translations"
+
+	# Fix charset
+	@ find ./po -type f -name "*.po*" -exec sed -i 's/charset=CHARSET/charset=UTF-8/' {} \;
+
+	# Merge new strings with translations
+	@ for POFILE in $(shell echo ./po/*.po); do \
+		msgmerge --quiet --backup=none --update $$POFILE ./po/$(source).pot ; \
+	done && echo "Po files updated"
+
+	# Apply desktop file modifications
+	@ for LAUNCHER in $(desktopfls); do \
+		intltool-merge --quiet --desktop-style ./po $$LAUNCHER.in $$LAUNCHER ; \
+		rm $$LAUNCHER.in.h $$LAUNCHER.in ; \
+	done && echo "Desktop files updated with new translations"
+	
+	# Push pot file to Transifex
+	#tx push -s

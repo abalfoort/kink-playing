@@ -1,0 +1,10 @@
+__title__ = 'kink-playing'
+__version__ = '1.0.0'
+__author__ = 'Arjen Balfoort'
+__author_email__ = 'arjenbalfoort@hotmail.com'
+__maintainer__ = ''
+__maintainer_email__ = ''
+__url__ = 'https://github.com/abalfoort/kink-playing'
+__description__ = 'Show a notification when ꓘINK is playing a new song'
+__download_url__ = 'https://github.com/abalfoort/kink-playing/-/archive/master/kink-playing-master.tar.gz'
+
