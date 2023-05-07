@@ -206,17 +206,14 @@ class KinkPlaying():
             title_title = _('Title')
             artist_str = ''
             title_str = ''
-            spaces = '<td> </td><td> </td><td> </td><td> </td>'
 
             # Artist
             if csv_data[0][1]:
-                artist_str = (f"<tr><td><b>{artist_title}</b></td><td>:"
-                              f"</td>{spaces}<td>{csv_data[0][1]}</td></tr>")
+                artist_str = f"<b>{artist_title}</b>: {csv_data[0][1]}"
 
             # Title
             if csv_data[0][2]:
-                title_str = (f"<tr><td><b>{title_title}</b></td><td>:"
-                             f"</td>{spaces}<td>{csv_data[0][2]}</td></tr>")
+                title_str = f"<b>{title_title}</b>: {csv_data[0][2]}"
 
             # Album art
             if csv_data[0][4]:
@@ -235,7 +232,7 @@ class KinkPlaying():
             if self.notification_timeout > 0:
                 print((f"Now playing: {csv_data[0][1]} - {csv_data[0][2]}"))
                 self.show_notification(summary=f"{self.station}: {csv_data[0][3]}",
-                                       body=(f"<table>{artist_str}{title_str}</table>"),
+                                       body=f"{artist_str}\n{title_str}",
                                        thumb=self.tmp_thumb)
 
     def _save_thumb(self, url):
