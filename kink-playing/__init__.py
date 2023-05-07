@@ -63,8 +63,8 @@ def uncaught_excepthook(*args):
         details = '\n'.join(traceback.format_exception(*args)).replace('<', '').replace('>', '')
         # Save to error file
         error_file = join(Path.home(), ".kink-playing/error.log")
-        with open(file=error_file, mode='w', encoding='utf-8') as f:
-            f.write(details)
+        with open(file=error_file, mode='w', encoding='utf-8') as err_fle:
+            err_fle.write(details)
         title = 'Unexpected error'
         msg = f"Please submit a bug report: {error_file}"
         ErrorDialog(title, f"<b>{msg}</b>" , f"<tt>{details}</tt>", None, True)
