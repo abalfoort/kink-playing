@@ -1,5 +1,5 @@
 __title__ = 'kink-playing'
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 __author__ = 'Arjen Balfoort'
 __author_email__ = 'arjenbalfoort@hotmail.com'
 __maintainer__ = ''

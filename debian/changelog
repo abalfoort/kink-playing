@@ -1,3 +1,9 @@
+kink-playing (1.0.1) testing; urgency=low
+
+  * Cleanup code
+
+ -- Arjen Balfoort <arjenbalfoort@hotmail.com>  Sun, 07 May 2023 12:32:05 +0200
+
 kink-playing (1.0.0) testing; urgency=low
 
   * Initial version
