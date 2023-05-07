@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-07 12:23+0200\n"
+"POT-Creation-Date: 2023-05-07 17:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,31 +29,31 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
-#: kink-playing/kink.py:392
+#: kink-playing/kink.py:389
 msgid "Show played songs"
 msgstr ""
 
-#: kink-playing/kink.py:395
+#: kink-playing/kink.py:392
 msgid "Settings"
 msgstr ""
 
-#: kink-playing/kink.py:402
+#: kink-playing/kink.py:399
 msgid "Stations"
 msgstr ""
 
-#: kink-playing/kink.py:419
+#: kink-playing/kink.py:416
 msgid "Now playing"
 msgstr ""
 
-#: kink-playing/kink.py:426
+#: kink-playing/kink.py:423
 msgid "Pause"
 msgstr ""
 
-#: kink-playing/kink.py:430
+#: kink-playing/kink.py:427
 msgid "Play"
 msgstr ""
 
-#: kink-playing/kink.py:437
+#: kink-playing/kink.py:434
 msgid "Quit"
 msgstr ""
 
