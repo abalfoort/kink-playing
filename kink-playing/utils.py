@@ -39,7 +39,7 @@ def open_text_file(file_path):
     # Now the exit code of the text editor process is available as process.returncode
     return process.returncode
 
-def str_int(nr_str, default_int):
+def str_int(nr_str, default_int=0):
     """ Convert string to integer or return default value. """
     try:
         return int(nr_str)
