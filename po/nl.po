@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-05 12:18+0200\n"
+"POT-Creation-Date: 2023-05-07 12:23+0200\n"
 "PO-Revision-Date: 2020-12-31 15:03+0000\n"
 "Last-Translator: Arjen Balfoort <arjenbalfoort@hotmail.com>, 2021\n"
 "Language-Team: Dutch (https://www.transifex.com/abalfoort/teams/54212/nl/)\n"
@@ -21,44 +21,44 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: kink-playing/kink.py:134
+#: kink-playing/kink.py:156
 msgid "Unable to connect to:"
 msgstr "Niet in staat te verbinden:"
 
-#: kink-playing/kink.py:183
+#: kink-playing/kink.py:205
 msgid "Artist"
 msgstr "Artiest"
 
-#: kink-playing/kink.py:184
+#: kink-playing/kink.py:206
 msgid "Title"
 msgstr "Titel"
 
-#: kink-playing/kink.py:356
+#: kink-playing/kink.py:392
 msgid "Show played songs"
 msgstr "Toon gespeelde nummers"
 
-#: kink-playing/kink.py:359
+#: kink-playing/kink.py:395
 msgid "Settings"
 msgstr "Instellingen"
 
-#: kink-playing/kink.py:366
+#: kink-playing/kink.py:402
 #, fuzzy
 msgid "Stations"
 msgstr "Duur"
 
-#: kink-playing/kink.py:383
+#: kink-playing/kink.py:419
 msgid "Now playing"
 msgstr "Speelt nu af"
 
-#: kink-playing/kink.py:390
+#: kink-playing/kink.py:426
 msgid "Pause"
 msgstr ""
 
-#: kink-playing/kink.py:394
+#: kink-playing/kink.py:430
 msgid "Play"
 msgstr ""
 
-#: kink-playing/kink.py:401
+#: kink-playing/kink.py:437
 msgid "Quit"
 msgstr "Afsluiten"
 
