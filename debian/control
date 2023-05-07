@@ -19,5 +19,6 @@ Depends: ${misc:Depends}, ${python3:Depends}
   , python3-iniparse
   , python3-vlc
   , xdg-utils
+Suggests: python3-ipdb
 Description: Show ꓘINK notification
  Show a notification when ꓘINK is playing a new song.
