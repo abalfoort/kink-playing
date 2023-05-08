@@ -1,3 +1,11 @@
+kink-playing (1.0.4) testing; urgency=low
+
+  * Remove the use of csv data
+  * Save album art in ~/.kink-playing
+  * Include args and returns in function descriptions
+
+ -- Arjen Balfoort <arjenbalfoort@hotmail.com>  Mon, 08 May 2023 10:28:14 +0200
+
 kink-playing (1.0.3) testing; urgency=low
 
   * Remove HTML text in notification
