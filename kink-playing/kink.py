@@ -8,15 +8,13 @@
     i18n:         http://docs.python.org/3/library/gettext.html
     notify:       https://lazka.github.io/pgi-docs/#Notify-0.7
     appindicator: https://lazka.github.io/pgi-docs/#AyatanaAppIndicator3-0.1
-    csv:          https://docs.python.org/3/library/csv.html
     requests:     https://requests.readthedocs.io/en/latest
     vlc:          https://www.olivieraubert.net/vlc/python-ctypes/doc/
-    Author:       Arjen Balfoort, 07-05-2023
+    Author:       Arjen Balfoort, 08-05-2023
 """
 
 import gettext
 import os
-import csv
 import subprocess
 import json
 from enum import Enum
@@ -77,12 +75,15 @@ class KinkPlaying():
         local_dir = join(home, f".{APP_ID}")
         autostart_dt = join(home, f".config/autostart/{APP_ID}-autostart.desktop")
         self.settings = join(local_dir, 'settings.ini')
-        self.csv = join(local_dir, f"{APP_ID}.csv")
-        self.tmp_thumb = f"/tmp/{APP_ID}.jpg"
+        self.tmp_thumb = f"{local_dir}/album_art.jpg"
         self.grey_icon = join(scriptdir, f"{APP_ID}-grey.svg")
-        self.instance = vlc.Instance("--intf dummy")
+        self.instance = vlc.Instance('--intf dummy')
         self.list_player = self.instance.media_list_player_new()
         self.station = None
+        self.cur_playing = {'station': '', 'program': '',
+                            'artist': '','title': '', 'album_art': ''}
+        # Use dict to negate the mutability of self.cur_playing
+        self.prev_playing = dict(self.cur_playing)
 
         # to keep comments, you have to trick configparser into believing that
         # lines starting with ";" are not comments, but they are keys without a value.
@@ -140,10 +141,6 @@ class KinkPlaying():
 
     def _run_check(self):
         """ Poll Kink for currently playing song. """
-        # Initiate csv file (tab delimited)
-        open(file=self.csv, mode='w', encoding='utf-8').close()
-        # Initiate variables
-        prev_title = ''
         was_connected = True
 
         while not self.check_done_event.is_set():
@@ -165,19 +162,14 @@ class KinkPlaying():
                     self.indicator.set_icon_full(APP_ID, '')
                     was_connected = True
 
-                # Retrieve the title first
-                playing = self.get_playing()
-                if playing:
-                    if playing['title'] and playing['title'] !=  prev_title:
-                        # Logging
-                        with open(file=self.csv, mode='a', encoding='utf-8') as csv_fle:
-                            csv_fle.write(f"{self.station}\t{playing['artist']}\t{playing['title']}"
-                                          f"\t{playing['program']}\t{playing['album_art']}\n")
-                        # Send notification
-                        self.show_song_info()
+                # Check if there is new playing data
+                self._fill_cur_playing()
+                if self.cur_playing != self.prev_playing:
+                    # Send notification
+                    self.show_song_info()
 
-                        # Save the title for the next loop
-                        prev_title = playing['title']
+                    # Save playing data for the next loop
+                    self.prev_playing = self.cur_playing
 
             # Wait until we continue with the loop
             self.check_done_event.wait(self.wait)
@@ -186,43 +178,14 @@ class KinkPlaying():
     # Kink functions
     # ===============================================
 
-    def show_song_info(self, index=1):
+    def show_song_info(self):
         """ Show song information in notification. """
-        # Get last two songs from csv data
-        csv_data = []
-        i = 0
-        with open(file=self.csv, mode='r', encoding='utf-8') as csv_fle:
-            for row in reversed(list(csv.reader(csv_fle, delimiter='\t'))):
-                i += 1
-                # We need to save the selected song
-                # and the previous song to compare thumbnails
-                if len(row) >= 5 and i in (index, index + 1):
-                    csv_data.append(row)
-                    if i == index + 1:
-                        break
-
-        if csv_data:
-            artist_title = _('Artist')
-            title_title = _('Title')
-            artist_str = ''
-            title_str = ''
-
-            # Artist
-            if csv_data[0][1]:
-                artist_str = f"<b>{artist_title}</b>: {csv_data[0][1]}"
-
-            # Title
-            if csv_data[0][2]:
-                title_str = f"<b>{title_title}</b>: {csv_data[0][2]}"
-
+        if self.cur_playing:
             # Album art
-            if csv_data[0][4]:
+            if self.cur_playing['album_art']:
                 # Check with previous song before downloading thumbnail
-                if not exists(self.tmp_thumb) or len(csv_data) == 1:
-                    self._save_thumb(csv_data[0][4])
-                elif len(csv_data) > 1:
-                    if csv_data[0][4] != csv_data[1][4] or index > 1:
-                        self._save_thumb(csv_data[0][4])
+                if self.cur_playing['album_art'] != self.prev_playing['album_art']:
+                    self._save_thumb(self.cur_playing['album_art'])
             else:
                 # Remove the thumbnail if this song has no album art
                 if exists(self.tmp_thumb):
@@ -230,13 +193,20 @@ class KinkPlaying():
 
             # Show notification
             if self.notification_timeout > 0:
-                print((f"Now playing: {csv_data[0][1]} - {csv_data[0][2]}"))
-                self.show_notification(summary=f"{self.station}: {csv_data[0][3]}",
-                                       body=f"{artist_str}\n{title_str}",
+                artist = _('Artist')
+                title = _('Title')
+                print((f"Now playing: {self.cur_playing['artist']} - {self.cur_playing['title']}"))
+                self.show_notification(summary=f"{self.station}: {self.cur_playing['program']}",
+                                       body=(f"<b>{artist}</b>: {self.cur_playing['artist']}\n"
+                                             f"<b>{title}</b>: {self.cur_playing['title']}"),
                                        thumb=self.tmp_thumb)
 
     def _save_thumb(self, url):
-        """ Retrieve image data from url and save to path """
+        """Retrieve image data from url and save to path
+
+        Args:
+            url (str): image url
+        """
         if not url:
             if os.path.exists(self.tmp_thumb):
                 os.remove(self.tmp_thumb)
@@ -247,14 +217,22 @@ class KinkPlaying():
                 file.write(res.content)
 
     def _json_request(self):
-        """ Return json data from Kink. """
+        """Get json data from KINK.
+
+        Returns:
+            json: now playing data from KINK
+        """
         res = requests.get(self.json, timeout=self.wait)
         if res.status_code == 200:
             return json.loads(res.text)
         return None
 
     def get_stations(self):
-        """ Get lists of Kink stations """
+        """Get lists of Kink stations
+
+        Returns:
+            list: list with available KINK stations
+        """
         obj = self._json_request()
         if obj:
             s_dict = obj['stations']
@@ -265,7 +243,11 @@ class KinkPlaying():
         return stations
 
     def switch_station(self, station):
-        """ Switch station """
+        """Switch KINK station.
+
+        Args:
+            station (str): KINK station name
+        """
         if station == self.station:
             return
         self.station = station
@@ -281,39 +263,54 @@ class KinkPlaying():
 
         self.indicator.set_menu(self._build_menu())
 
-    def get_playing(self):
-        """ Get what's playing data from Kink. """
+    def _fill_cur_playing(self):
+        """Get what's playing data from Kink."""
         obj = self._json_request()
+        program = ''
+        artist = ''
+        title = ''
+        album_art = ''
         if obj:
             try:
                 artist = obj['extended'][self.station]['artist']
-            except (KeyError, TypeError):
-                artist = ''
+            except Exception:
+                pass
             try:
                 title = obj['extended'][self.station]['title']
-            except (KeyError, TypeError):
-                title = ''
+            except Exception:
+                pass 
             try:
                 album_art = obj['extended'][self.station]['album_art']['320']
-            except (KeyError, TypeError):
-                album_art = ''
+            except Exception:
+                pass
             try:
                 program = obj['extended'][self.station]['program']['title']
-            except (KeyError, TypeError):
-                program = ''
-        else:
-            return {}
-        return {"artist": artist, "title": title, "album_art": album_art, "program": program}
+            except Exception:
+                pass
+
+        self.cur_playing['station'] = self.station
+        self.cur_playing['program'] = program
+        self.cur_playing['artist'] = artist
+        self.cur_playing['title'] = title
+        self.cur_playing['album_art'] = album_art
 
     def _is_connected(self):
-        """ Check if Kink is online. """
+        """Check if Kink is online.
+
+        Returns:
+            bool: able to connect to KINK or not
+        """
         res = requests.get(self.json, timeout=self.wait)
         if res.status_code == 200:
             return True
         return False
 
     def _get_pls(self):
-        """ Get the station playlist url """
+        """Get the station playlist url
+
+        Returns:
+            str: play list url for current station
+        """
         if 'dna' in self.station:
             return self.streams['dna']
         if 'indie' in self.station:
@@ -348,7 +345,14 @@ class KinkPlaying():
     # System Tray Icon
     # ===============================================
     def _get_image(self, icon):
-        """ Get GtkImage from icon name or path """
+        """Get GtkImage from icon name or path
+
+        Args:
+            icon (string): icon path
+
+        Returns:
+            Gtk.Image: image binary from path
+        """
         if not icon:
             return None
         if os.path.exists(icon):
@@ -357,8 +361,18 @@ class KinkPlaying():
             img = Gtk.Image.new_from_icon_name(icon, Gtk.IconSize.MENU)
         return img
 
-    def _menu_item(self, label="", icon=None, function=None, arguments=None):
-        """ Return a MenuItem with given arguments """
+    def _menu_item(self, label="", icon=None, function=None, argument=None):
+        """Create MenuItem with given arguments
+
+        Args:
+            label (str, optional): label. Defaults to "".
+            icon (str, optional): icon name/path. Defaults to None.
+            function (obj, optional): function to call when clicked. Defaults to None.
+            argument (str, optional): function argument. Defaults to None.
+
+        Returns:
+            Gtk.MenuItem: menu item for Gtk.Menu
+        """
         item = Gtk.MenuItem.new()
         item_box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 6)
 
@@ -370,14 +384,18 @@ class KinkPlaying():
         item.add(item_box)
         item.show_all()
 
-        if function and arguments:
-            item.connect("activate", lambda * a: function(arguments))
+        if function and argument:
+            item.connect('activate', lambda * a: function(argument))
         elif function:
-            item.connect("activate", lambda * a: function())
+            item.connect('activate', lambda * a: function())
         return item
 
     def _build_menu(self):
-        """ Build menu for the tray icon. """
+        """Build menu for the tray icon.
+
+        Returns:
+            Gtk.Menu: indicator menu
+        """
         menu = Gtk.Menu()
 
         # Kink menu
@@ -385,9 +403,6 @@ class KinkPlaying():
         sub_menu = Gtk.Menu()
         sub_menu.append(self._menu_item(label=self.site[self.site.rfind('/') + 1:],
                                         function=self.show_site))
-        sub_menu.append(Gtk.SeparatorMenuItem())
-        sub_menu.append(self._menu_item(label=_('Show played songs'),
-                                        function=self.show_csv))
         sub_menu.append(Gtk.SeparatorMenuItem())
         sub_menu.append(self._menu_item(label=_('Settings'),
                                         function=self.show_settings))
@@ -407,7 +422,7 @@ class KinkPlaying():
                 sub_menu.append(self._menu_item(label=station,
                                                 icon=select_icon,
                                                 function=self.switch_station,
-                                                arguments=station))
+                                                argument=station))
             item_stations.set_submenu(sub_menu)
         menu.append(item_stations)
 
@@ -451,10 +466,6 @@ class KinkPlaying():
         """ Show last played song. """
         self.show_song_info()
 
-    def show_csv(self, widget=None):
-        """ Open kink-playing.csv in default editor. """
-        subprocess.call(['xdg-open', self.csv])
-
     def show_site(self, widget=None):
         """ Show site in default browser """
         subprocess.call(['xdg-open', self.site])
@@ -485,7 +496,14 @@ class KinkPlaying():
         Gtk.main_quit()
 
     def _check_conf_key(self, key):
-        """ Check key in settings.ini and append missing key """
+        """Check key in settings.ini and append to file if missing.
+
+        Args:
+            key (str): settings key.
+            
+        Returns:
+            str: value of the key
+        """
         try:
             value = self.kink_dict['kink'][key]
         except KeyError:
@@ -520,7 +538,13 @@ class KinkPlaying():
             self.conf_parser.write(conf)
 
     def show_notification(self, summary, body=None, thumb=None):
-        """ Show the notification. """
+        """Show the notification.
+
+        Args:
+            summary (str): notification summary.
+            body (str, optional): notification body text. Defaults to None.
+            thumb (str, optional): icon path. Defaults to None.
+        """
         notification = Notify.Notification.new(summary, body, thumb)
         notification.set_timeout(self.notification_timeout * 1000)
         notification.set_urgency(Notify.Urgency.LOW)
