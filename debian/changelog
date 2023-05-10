@@ -1,3 +1,10 @@
+kink-playing (1.0.5) testing; urgency=low
+
+  * Fix show info just once
+  * Remove kink-indie from station list: unused
+
+ -- Arjen Balfoort <arjenbalfoort@hotmail.com>  Wed, 10 May 2023 13:17:12 +0200
+
 kink-playing (1.0.4) testing; urgency=low
 
   * Remove the use of csv data
