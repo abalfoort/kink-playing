@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-05-08 11:40+0200\n"
+"POT-Creation-Date: 2023-05-10 15:45+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,39 +17,43 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: kink-playing/kink.py:153
+#: kink-playing/kink.py:157
 msgid "Unable to connect to:"
 msgstr ""
 
-#: kink-playing/kink.py:196
+#: kink-playing/kink.py:199
 msgid "Artist"
 msgstr ""
 
-#: kink-playing/kink.py:197
+#: kink-playing/kink.py:200
 msgid "Title"
 msgstr ""
 
-#: kink-playing/kink.py:407
+#: kink-playing/kink.py:411
 msgid "Settings"
 msgstr ""
 
 #: kink-playing/kink.py:414
+msgid "Playlist"
+msgstr ""
+
+#: kink-playing/kink.py:421
 msgid "Stations"
 msgstr ""
 
-#: kink-playing/kink.py:431
+#: kink-playing/kink.py:438
 msgid "Now playing"
 msgstr ""
 
-#: kink-playing/kink.py:438
+#: kink-playing/kink.py:445
 msgid "Pause"
 msgstr ""
 
-#: kink-playing/kink.py:442
+#: kink-playing/kink.py:449
 msgid "Play"
 msgstr ""
 
-#: kink-playing/kink.py:449
+#: kink-playing/kink.py:456
 msgid "Quit"
 msgstr ""
 
