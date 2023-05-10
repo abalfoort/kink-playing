@@ -50,7 +50,6 @@ class DefaultSettings(Enum):
     SITE = 'https://kink.nl'
     KINK = 'https://playerservices.streamtheworld.com/pls/KINK.pls'
     DNA = 'http://playerservices.streamtheworld.com/pls/KINK_DNA.pls'
-    INDIE = 'https://playerservices.streamtheworld.com/pls/KINKINDIE.pls'
     DISTRO = 'https://playerservices.streamtheworld.com/pls/KINK_DISTORTION.pls'
     JSON = 'https://api.kink.nl/static/now-playing.json'
     STATION = 'kink'
@@ -165,11 +164,14 @@ class KinkPlaying():
                 # Check if there is new playing data
                 self._fill_cur_playing()
                 if self.cur_playing != self.prev_playing:
+                    # Get album art
+                    self._save_thumb(self.cur_playing['album_art'])
+
                     # Send notification
                     self.show_song_info()
 
                     # Save playing data for the next loop
-                    self.prev_playing = self.cur_playing
+                    self.prev_playing = dict(self.cur_playing)
 
             # Wait until we continue with the loop
             self.check_done_event.wait(self.wait)
@@ -180,26 +182,15 @@ class KinkPlaying():
 
     def show_song_info(self):
         """ Show song information in notification. """
-        if self.cur_playing:
-            # Album art
-            if self.cur_playing['album_art']:
-                # Check with previous song before downloading thumbnail
-                if self.cur_playing['album_art'] != self.prev_playing['album_art']:
-                    self._save_thumb(self.cur_playing['album_art'])
-            else:
-                # Remove the thumbnail if this song has no album art
-                if exists(self.tmp_thumb):
-                    os.remove(self.tmp_thumb)
-
+        if self.cur_playing and self.notification_timeout > 0:
             # Show notification
-            if self.notification_timeout > 0:
-                artist = _('Artist')
-                title = _('Title')
-                print((f"Now playing: {self.cur_playing['artist']} - {self.cur_playing['title']}"))
-                self.show_notification(summary=f"{self.station}: {self.cur_playing['program']}",
-                                       body=(f"<b>{artist}</b>: {self.cur_playing['artist']}\n"
-                                             f"<b>{title}</b>: {self.cur_playing['title']}"),
-                                       thumb=self.tmp_thumb)
+            artist = _('Artist')
+            title = _('Title')
+            print((f"Now playing: {self.cur_playing['artist']} - {self.cur_playing['title']}"))
+            self.show_notification(summary=f"{self.station}: {self.cur_playing['program']}",
+                                    body=(f"<b>{artist}</b>: {self.cur_playing['artist']}\n"
+                                            f"<b>{title}</b>: {self.cur_playing['title']}"),
+                                    thumb=self.tmp_thumb)
 
     def _save_thumb(self, url):
         """Retrieve image data from url and save to path
@@ -240,6 +231,10 @@ class KinkPlaying():
             return []
         stations = list(s_dict.keys())
         stations.sort()
+
+        # kink-indie is not used
+        stations.remove('kink-indie')
+
         return stations
 
     def switch_station(self, station):
@@ -278,7 +273,7 @@ class KinkPlaying():
             try:
                 title = obj['extended'][self.station]['title']
             except Exception:
-                pass 
+                pass
             try:
                 album_art = obj['extended'][self.station]['album_art']['320']
             except Exception:
@@ -313,8 +308,6 @@ class KinkPlaying():
         """
         if 'dna' in self.station:
             return self.streams['dna']
-        if 'indie' in self.station:
-            return self.streams['indie']
         if 'distortion' in self.station:
             return self.streams['distortion']
         return self.streams['kink']
@@ -519,7 +512,6 @@ class KinkPlaying():
         self.site = self._check_conf_key('site')
         self.streams = {'kink': self._check_conf_key('stream_kink'),
                         'dna': self._check_conf_key('stream_dna'),
-                        'indie': self._check_conf_key('stream_indie'),
                         'distortion': self._check_conf_key('stream_distortion')}
         self.json = self._check_conf_key('json')
         self.station = self._check_conf_key('station')
