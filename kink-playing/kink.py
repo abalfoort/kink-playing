@@ -73,9 +73,9 @@ class KinkPlaying():
         home = str(Path.home())
         local_dir = join(home, f".{APP_ID}")
         autostart_dt = join(home, f".config/autostart/{APP_ID}-autostart.desktop")
-        self.log = join(home, f"{APP_ID}.log")
+        self.playlist = join(local_dir, f"{APP_ID}.txt")
         self.settings = join(local_dir, 'settings.ini')
-        self.tmp_thumb = f"{local_dir}/album_art.jpg"
+        self.tmp_thumb = join(local_dir, 'album_art.jpg')
         self.grey_icon = join(scriptdir, f"{APP_ID}-grey.svg")
         self.instance = vlc.Instance('--intf dummy')
         self.list_player = self.instance.media_list_player_new()
@@ -130,8 +130,8 @@ class KinkPlaying():
         Notify.init(APP_NAME)
 
         # Reset log
-        if os.path.exists(self.log):
-            os.remove(self.log)
+        if exists(self.playlist):
+            os.remove(self.playlist)
 
         # Load the configured playlist
         self._add_playlist()
@@ -179,8 +179,8 @@ class KinkPlaying():
                     playing = (f"{self.station}: "
                                f"{self.cur_playing['artist']} - {self.cur_playing['title']}")
                     print((playing))
-                    with open(file=self.log, mode='a', encoding='utf-8') as log:
-                        log.write(playing)
+                    with open(file=self.playlist, mode='a', encoding='utf-8') as log:
+                        log.write(f"{playing}\n")
 
                     # Save playing data for the next loop
                     self.prev_playing = dict(self.cur_playing)
@@ -210,7 +210,7 @@ class KinkPlaying():
             url (str): image url
         """
         if not url:
-            if os.path.exists(self.tmp_thumb):
+            if exists(self.tmp_thumb):
                 os.remove(self.tmp_thumb)
             return
         res = requests.get(url, timeout=self.wait)
@@ -359,7 +359,7 @@ class KinkPlaying():
         """
         if not icon:
             return None
-        if os.path.exists(icon):
+        if exists(icon):
             img = Gtk.Image.new_from_file(icon, Gtk.IconSize.MENU)
         else:
             img = Gtk.Image.new_from_icon_name(icon, Gtk.IconSize.MENU)
@@ -479,7 +479,7 @@ class KinkPlaying():
 
     def show_log(self, widget=None):
         """ Show site in default browser """
-        subprocess.call(['xdg-open', self.log])
+        subprocess.call(['xdg-open', self.playlist])
 
     def play_pause(self, widget=None):
         """ Play or pause Kink radio """
