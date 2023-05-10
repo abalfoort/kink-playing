@@ -73,6 +73,7 @@ class KinkPlaying():
         home = str(Path.home())
         local_dir = join(home, f".{APP_ID}")
         autostart_dt = join(home, f".config/autostart/{APP_ID}-autostart.desktop")
+        self.log = join(home, f"{APP_ID}.log")
         self.settings = join(local_dir, 'settings.ini')
         self.tmp_thumb = f"{local_dir}/album_art.jpg"
         self.grey_icon = join(scriptdir, f"{APP_ID}-grey.svg")
@@ -128,6 +129,10 @@ class KinkPlaying():
         # Init notifier
         Notify.init(APP_NAME)
 
+        # Reset log
+        if os.path.exists(self.log):
+            os.remove(self.log)
+
         # Load the configured playlist
         self._add_playlist()
         if self.autoplay == 1:
@@ -170,6 +175,13 @@ class KinkPlaying():
                     # Send notification
                     self.show_song_info()
 
+                    # Keep a simple log
+                    playing = (f"{self.station}: "
+                               f"{self.cur_playing['artist']} - {self.cur_playing['title']}")
+                    print((playing))
+                    with open(file=self.log, mode='a', encoding='utf-8') as log:
+                        log.write(playing)
+
                     # Save playing data for the next loop
                     self.prev_playing = dict(self.cur_playing)
 
@@ -186,7 +198,6 @@ class KinkPlaying():
             # Show notification
             artist = _('Artist')
             title = _('Title')
-            print((f"Now playing: {self.cur_playing['artist']} - {self.cur_playing['title']}"))
             self.show_notification(summary=f"{self.station}: {self.cur_playing['program']}",
                                     body=(f"<b>{artist}</b>: {self.cur_playing['artist']}\n"
                                             f"<b>{title}</b>: {self.cur_playing['title']}"),
@@ -399,6 +410,9 @@ class KinkPlaying():
         sub_menu.append(Gtk.SeparatorMenuItem())
         sub_menu.append(self._menu_item(label=_('Settings'),
                                         function=self.show_settings))
+        sub_menu.append(Gtk.SeparatorMenuItem())
+        sub_menu.append(self._menu_item(label=_('Playlist'),
+                                        function=self.show_log))
         item_kink.set_submenu(sub_menu)
         menu.append(item_kink)
 
@@ -462,6 +476,10 @@ class KinkPlaying():
     def show_site(self, widget=None):
         """ Show site in default browser """
         subprocess.call(['xdg-open', self.site])
+
+    def show_log(self, widget=None):
+        """ Show site in default browser """
+        subprocess.call(['xdg-open', self.log])
 
     def play_pause(self, widget=None):
         """ Play or pause Kink radio """
