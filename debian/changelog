@@ -1,3 +1,9 @@
+kink-playing (1.0.7) testing; urgency=low
+
+  * Add dependency gir1.2-notify-0.7
+
+ -- Arjen Balfoort <arjenbalfoort@hotmail.com>  Thu, 11 May 2023 09:35:05 +0200
+
 kink-playing (1.0.6) testing; urgency=low
 
   * Keep simple playlist log
