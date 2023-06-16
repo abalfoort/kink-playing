@@ -12,10 +12,10 @@ from pathlib import Path
 from os.path import join
 try:
     from .kink import KinkPlaying
-    from .dialogs import ErrorDialog
+    from .dialogs import error_dialog
 except ImportError:
     from kink import KinkPlaying
-    from dialogs import ErrorDialog
+    from dialogs import error_dialog
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -67,7 +67,7 @@ def uncaught_excepthook(*args):
             err_fle.write(details)
         title = 'Unexpected error'
         msg = f"Please submit a bug report: {error_file}"
-        ErrorDialog(title, f"<b>{msg}</b>" , f"<tt>{details}</tt>", None, True)
+        error_dialog(title=title, text=f"<b>{msg}</b>" , text2=f"<tt>{details}</tt>")
 
     sys.exit(1)
 
@@ -75,16 +75,9 @@ sys.excepthook = uncaught_excepthook
 
 def main():
     """Main function initiating KinkPlaying class"""
-    # Check if already running
-    cmd = f"pgrep -u {getpass.getuser()} -f \"^/.*/python.*importlib.*\('kink-playing'\)\""
-    process = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    pid, err = process.communicate()
-    if len(pid.splitlines()) > 1:
-        print(("kink-playing is already running - exiting"))
-    else:
-        KinkPlaying()
-        signal.signal(signal.SIGINT, signal.SIG_DFL)
-        Gtk.main()
+    KinkPlaying()
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    Gtk.main()
 
 if __name__ == '__main__':
     main()

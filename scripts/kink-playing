@@ -6,6 +6,13 @@ if [ -z "$PYTHON" ]; then
   exit 1
 fi
 
+# Check if already running
+PID=$(pgrep -u $USER -f 'python3 .*import.*kink-playing')
+if [ ! -z "$PID" ]; then
+    echo "kink-playing is already running - exiting"
+    exit 2
+fi
+
 mkdir -p "$HOME/.kink-playing"
 
 DEBUG=false; case "$@" in -d|--debug) DEBUG=true; esac
@@ -19,3 +26,5 @@ else
     $PYTHON -OO -c "import importlib; kp = importlib.import_module('kink-playing'); kp.main()" &
     echo "You can now close the terminal."
 fi
+
+exit 0
