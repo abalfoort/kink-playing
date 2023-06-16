@@ -1,3 +1,10 @@
+kink-playing (1.0.8) testing; urgency=low
+
+  * Fix already running while not yet running
+  * Fix binary mode doesn't take an encoding argument
+
+ -- Arjen Balfoort <arjenbalfoort@hotmail.com>  Fri, 16 Jun 2023 04:44:41 +0200
+
 kink-playing (1.0.7) testing; urgency=low
 
   * Add dependency gir1.2-notify-0.7
