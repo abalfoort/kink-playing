@@ -34,7 +34,7 @@ class Dialog(Gtk.MessageDialog):
     Args:
         Gtk (MessageDialog): MessageDialog object
     """
-    def __init__(self, message_type, buttons, title, text, 
+    def __init__(self, message_type, buttons, title, text,
                  text2=None, parent=None, safe=True, icon=None):
         parent = parent or next((w for w in Gtk.Window.list_toplevels() if w.get_title()), None)
         Gtk.MessageDialog.__init__(self,
@@ -86,21 +86,21 @@ class Dialog(Gtk.MessageDialog):
                 return False
 
 
-def MessageDialog(*args):
+def message_dialog(*args):
     """Message Dialog object"""
     return Dialog(Gtk.MessageType.INFO, Gtk.ButtonsType.OK, *args).show()
 
 
-def QuestionDialog(*args):
+def question_dialog(*args):
     """Question Dialog object"""
     return Dialog(Gtk.MessageType.QUESTION, Gtk.ButtonsType.YES_NO, *args).show()
 
 
-def WarningDialog(*args):
+def warning_dialog(*args):
     """Warning Dialog object"""
     return Dialog(Gtk.MessageType.WARNING, Gtk.ButtonsType.OK, *args).show()
 
 
-def ErrorDialog(*args):
+def error_dialog(*args):
     """Error Dialog object"""
     return Dialog(Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, *args).show()
