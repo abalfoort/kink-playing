@@ -1,0 +1,16 @@
+README.md
+setup.py
+data/kink-playing.desktop
+data/kink-playing.svg
+kink-playing/__init__.py
+kink-playing/dialogs.py
+kink-playing/kink-playing-autostart.desktop
+kink-playing/kink-playing-grey.svg
+kink-playing/kink.py
+kink-playing/settings.ini
+kink-playing/utils.py
+kink_playing.egg-info/PKG-INFO
+kink_playing.egg-info/SOURCES.txt
+kink_playing.egg-info/dependency_links.txt
+kink_playing.egg-info/top_level.txt
+scripts/kink-playing

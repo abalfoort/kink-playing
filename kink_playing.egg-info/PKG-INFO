@@ -1,0 +1,33 @@
+Metadata-Version: 2.1
+Name: kink-playing
+Version: 1.0.8
+Summary: Show a notification when ꓘINK is playing a new song
+Home-page: https://github.com/abalfoort/kink-playing
+Download-URL: https://github.com/abalfoort/kink-playing/-/archive/master/kink-playing-master.tar.gz
+Author: Arjen Balfoort
+Author-email: arjenbalfoort@hotmail.com
+Maintainer: 
+Maintainer-email: 
+License: GNU General Public License v2 or later (GPLv2+)
+Platform: POSIX
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: End Users/Desktop
+Classifier: Topic :: Utilities
+Classifier: Natural Language :: English
+Classifier: Operating System :: POSIX :: Linux
+Classifier: License :: OSI Approved :: GNU General Public License v2 or later (GPLv2+)
+Classifier: Programming Language :: Python :: 3
+
+# kink-playing
+System tray app for ꓘINK radio.
+
+Features:
+
+* Show currently playing song.
+* Pause/play media.
+* Select a ꓘINK station
+* Show play list (tab delimited csv with played songs)
+* Settings: site url, stream url, now-playing url, default station, wait until next check, how long to show notifications, autostart, autoplay.
+
+## Screenshot
+![System Tray Screenshot](data/screenshot.jpg)
