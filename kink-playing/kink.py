@@ -215,7 +215,7 @@ class KinkPlaying():
             return
         res = requests.get(url, timeout=self.wait)
         if res.status_code == 200:
-            with open(self.tmp_thumb, 'wb') as file:
+            with open(file=self.tmp_thumb, mode='wb') as file:
                 file.write(res.content)
 
     def _json_request(self):
